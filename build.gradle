@@ -20,6 +20,7 @@ ext {
     set('assertJVersion', '3.21.0')
     set('junitVersion', '5.10.0')
     set('javafakerVersion', '1.0.2')
+    set('javaFakersVersion', '0.1')
 }
 
 dependencies {
@@ -31,6 +32,8 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
 
     implementation "org.assertj:assertj-core:$assertJVersion"
+
+    testImplementation "ru.multa.entia:java-fakers:$javaFakersVersion"
 }
 
 //publishing.publications {
