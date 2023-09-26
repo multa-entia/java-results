@@ -3,100 +3,57 @@ package ru.multa.entia.results.impl.result;
 import ru.multa.entia.results.api.result.Result;
 import ru.multa.entia.results.api.result.ResultBuilder;
 import ru.multa.entia.results.api.seed.Seed;
-
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
+import ru.multa.entia.results.api.seed.SeedBuilder;
+import ru.multa.entia.results.impl.seed.DefaultSeedBuilder;
 
 public class DefaultResultBuilder<T> implements ResultBuilder<T> {
+    private boolean ok;
+    private T value;
+    private Seed seed;
+
+    public static <T> Result<T> ok(T value){
+        return new DefaultResultBuilder<T>().success(true).value(value).build();
+    }
+
+    public static  <T> Result<T> fail(String code, Object... args){
+        return new DefaultResultBuilder<T>()
+                .success(false)
+                .seedBuilder()
+                .code(code)
+                .addLastArgs(args)
+                .apply()
+                .build();
+    }
+
     @Override
     public ResultBuilder<T> success(boolean ok) {
-        // TODO: 25.09.2023 !!!
-        return null;
+        this.ok = ok;
+        return this;
     }
 
     @Override
     public ResultBuilder<T> value(T value) {
-        // TODO: 25.09.2023 !!!
-        return null;
+        this.value = value;
+        return this;
     }
 
     @Override
     public ResultBuilder<T> seed(Seed seed) {
-        // TODO: 25.09.2023 !!!
-        return null;
+        this.seed = seed;
+        return this;
+    }
+
+    @Override
+    public SeedBuilder<T> seedBuilder() {
+        return createSeedBuilder();
     }
 
     @Override
     public Result<T> build() {
-        // TODO: 25.09.2023 !!!
-        return null;
+        return new DefaultResult<T>(ok, value, seed);
     }
 
-    // TODO: 25.09.2023 !!!
-//    final private Deque<Object> args = new ArrayDeque<>();
-//
-//    private boolean ok;
-//    private T value;
-//    private String code;
-//
-//    public static <T> Result<T> ok(T value){
-//        // TODO: 24.09.2023 !!!
-//        throw new RuntimeException("");
-//    }
-//
-//    public static  <T> Result<T> fail(String code, Object... args){
-//        // TODO: 24.09.2023 !!!
-//        throw new RuntimeException("");
-//    }
-//
-//    @Override
-//    public ResultBuilder<T> success(boolean ok) {
-//        this.ok = ok;
-//        return this;
-//    }
-//
-//    @Override
-//    public ResultBuilder<T> value(T value) {
-//        this.value = value;
-//        return this;
-//    }
-//
-//    @Override
-//    public ResultBuilder<T> code(String code) {
-//        this.code = code;
-//        return this;
-//    }
-//
-//    @Override
-//    public ResultBuilder<T> args(Object... args) {
-//        if (args == null){
-//            return this;
-//        }
-//        this.args.addAll(Arrays.asList(args));
-//        return this;
-//    }
-//
-//    @Override
-//    public ResultBuilder<T> args(boolean direct, Object... args) {
-//        if (args == null){
-//            return this;
-//        }
-//
-//        if (direct){
-//            this.args.addAll(Arrays.asList(args));
-//        } else {
-//            for (Object arg : args) {
-//                this.args.addFirst(arg);
-//            }
-//        }
-//
-//        return this;
-//    }
-//
-//    @Override
-//    public Result<T> build() {
-//        // TODO: 24.09.2023 !!!
-//        return null;
-//    }
+    private SeedBuilder<T> createSeedBuilder(){
+        return new DefaultSeedBuilder<>(this);
+    }
 }

@@ -54,6 +54,7 @@ public class DefaultSeedBuilder<T> implements SeedBuilder<T> {
 
     @Override
     public ResultBuilder<T> apply() {
+        resultBuilder.seed(new DefaultSeed(code, args.toArray()));
         return resultBuilder;
     }
 }
