@@ -91,27 +91,41 @@ class DefaultResultBuilderTest {
 
     @Test
     void shouldCheckBuilding_ok() {
-        boolean expectedSuccess = true;
         String expectedValue = Faker.str_().random(5, 10);
         Result<String> result = DefaultResultBuilder.<String>ok(expectedValue);
 
-        assertThat(result.ok()).isEqualTo(expectedSuccess);
+        assertThat(result.ok()).isTrue();
         assertThat(result.value()).isEqualTo(expectedValue);
     }
 
     @Test
     void shouldCheckBuilding_fail() {
-        boolean expectedSuccess = false;
         String expectedCode = Faker.str_().random(5, 10);
         String expectedArg = Faker.str_().random(5, 10);
 
         Result<String> result = DefaultResultBuilder.<String>fail(expectedCode, expectedArg);
 
-        assertThat(result.ok()).isEqualTo(expectedSuccess);
+        assertThat(result.ok()).isFalse();
         assertThat(result.seed().code()).isEqualTo(expectedCode);
         Object[] args = result.seed().args();
         assertThat(args).hasSize(1);
         assertThat(args[0]).isEqualTo(expectedArg);
+    }
+
+    @Test
+    void shouldCheckBuilding_failFromSeed() {
+        String expectedCode = Faker.str_().random(5, 10);
+        Object[] expectedArgs = {
+                Faker.str_().random(5, 10),
+                Faker.str_().random(5, 10)
+        };
+
+        Result<String> result = DefaultResultBuilder.<String>fail(new TestSeed(expectedCode, expectedArgs));
+
+        assertThat(result.ok()).isFalse();
+        assertThat(result.value()).isNull();
+        assertThat(result.seed().code()).isEqualTo(expectedCode);
+        assertThat(Arrays.equals(result.seed().args(), expectedArgs)).isTrue();
     }
 
     private Object getPrivateField(Object instance, String name) throws NoSuchFieldException, IllegalAccessException {

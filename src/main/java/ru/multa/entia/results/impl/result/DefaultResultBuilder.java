@@ -11,11 +11,11 @@ public class DefaultResultBuilder<T> implements ResultBuilder<T> {
     private T value;
     private Seed seed;
 
-    public static <T> Result<T> ok(T value){
+    public static <T> Result<T> ok(final T value){
         return new DefaultResultBuilder<T>().success(true).value(value).build();
     }
 
-    public static  <T> Result<T> fail(String code, Object... args){
+    public static <T> Result<T> fail(final String code, final Object... args){
         return new DefaultResultBuilder<T>()
                 .success(false)
                 .seedBuilder()
@@ -25,20 +25,24 @@ public class DefaultResultBuilder<T> implements ResultBuilder<T> {
                 .build();
     }
 
+    public static <T> Result<T> fail(final Seed seed){
+        return fail(seed.code(), seed.args());
+    }
+
     @Override
-    public ResultBuilder<T> success(boolean ok) {
+    public ResultBuilder<T> success(final boolean ok) {
         this.ok = ok;
         return this;
     }
 
     @Override
-    public ResultBuilder<T> value(T value) {
+    public ResultBuilder<T> value(final T value) {
         this.value = value;
         return this;
     }
 
     @Override
-    public ResultBuilder<T> seed(Seed seed) {
+    public ResultBuilder<T> seed(final Seed seed) {
         this.seed = seed;
         return this;
     }
