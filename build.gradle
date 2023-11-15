@@ -8,7 +8,7 @@ java {
 }
 
 group = 'ru.multa.entia'
-version = '0.2'
+version = '0.3'
 
 repositories {
     mavenCentral()
@@ -20,7 +20,7 @@ ext {
     set('assertJVersion', '3.21.0')
     set('junitVersion', '5.10.0')
     set('javafakerVersion', '1.0.2')
-    set('javaFakersVersion', '0.1')
+    set('javaFakersVersion', '0.2')
     set('mockitoVersion', '4.0.0')
 }
 

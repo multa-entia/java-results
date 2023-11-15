@@ -33,6 +33,7 @@ class DefaultSeedBuilderTest {
         assertThat(result).isEqualTo(expectedCode);
     }
 
+    @SuppressWarnings("unchecked")
     @SneakyThrows
     @Test
     void shouldCheckFirstArgsSetting_ifItNull() {
@@ -42,6 +43,7 @@ class DefaultSeedBuilderTest {
         assertThat(result).isEmpty();
     }
 
+    @SuppressWarnings("unchecked")
     @SneakyThrows
     @Test
     void shouldCheckFirstArgsSetting_ifItEmpty() {
@@ -51,6 +53,7 @@ class DefaultSeedBuilderTest {
         assertThat(result).isEmpty();
     }
 
+    @SuppressWarnings("unchecked")
     @SneakyThrows
     @Test
     void shouldCheckFirstArgsSetting() {
@@ -71,6 +74,7 @@ class DefaultSeedBuilderTest {
         assertThat(Arrays.equals(result.toArray(), expectedArgs)).isTrue();
     }
 
+    @SuppressWarnings("unchecked")
     @SneakyThrows
     @Test
     void shouldCheckLastArgsSetting_ifItNull() {
@@ -80,6 +84,7 @@ class DefaultSeedBuilderTest {
         assertThat(result).isEmpty();
     }
 
+    @SuppressWarnings("unchecked")
     @SneakyThrows
     @Test
     void shouldCheckLastArgsSetting_ifItEmpty() {
@@ -89,6 +94,7 @@ class DefaultSeedBuilderTest {
         assertThat(result).isEmpty();
     }
 
+    @SuppressWarnings("unchecked")
     @SneakyThrows
     @Test
     void shouldCheckLastArgsSetting() {

@@ -2,6 +2,8 @@ package ru.multa.entia.results.impl.result;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import ru.multa.entia.fakers.impl.Faker;
 import ru.multa.entia.results.api.result.Result;
 import ru.multa.entia.results.api.result.ResultBuilder;
@@ -90,6 +92,15 @@ class DefaultResultBuilderTest {
     }
 
     @Test
+    void shouldCheckBuilding_ok_withoutArgs() {
+        Result<Object> result = DefaultResultBuilder.<Object>ok();
+
+        assertThat(result.ok()).isTrue();
+        assertThat(result.value()).isNull();
+        assertThat(result.seed()).isNull();
+    }
+
+    @Test
     void shouldCheckBuilding_ok() {
         String expectedValue = Faker.str_().random(5, 10);
         Result<String> result = DefaultResultBuilder.<String>ok(expectedValue);
@@ -126,6 +137,105 @@ class DefaultResultBuilderTest {
         assertThat(result.value()).isNull();
         assertThat(result.seed().code()).isEqualTo(expectedCode);
         assertThat(Arrays.equals(result.seed().args(), expectedArgs)).isTrue();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "some-value,",
+            ","
+    })
+    void shouldCheckComputing_fromValueAndSeed_ifOk(String value, String code) {
+        Result<String> result = DefaultResultBuilder.<String>compute(
+                value,
+                code == null ? null : new TestSeed(code)
+        );
+
+        assertThat(result.ok()).isTrue();
+        assertThat(result.value()).isEqualTo(value);
+        assertThat(result.seed()).isNull();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            ",some-code",
+            "some-value,some-code"
+    })
+    void shouldCheckComputing_fromValueAndSeed_ifFail(String value, String code) {
+        TestSeed expectedSeed = new TestSeed(code);
+        Result<String> result = DefaultResultBuilder.<String>compute(value, expectedSeed);
+
+        assertThat(result.ok()).isFalse();
+        assertThat(result.value()).isNull();
+        assertThat(result.seed().code()).isEqualTo(expectedSeed.code);
+        assertThat(Arrays.equals(result.seed().args(), result.seed().args())).isTrue();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "some-value,",
+            ","
+    })
+    void shouldCheckComputing_fromValueAndCode_ifOk(String value, String code) {
+        Result<String> result = DefaultResultBuilder.<String>compute(value, code);
+
+        assertThat(result.ok()).isTrue();
+        assertThat(result.value()).isEqualTo(value);
+        assertThat(result.seed()).isNull();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            ",some-code",
+            "some-value,some-code"
+    })
+    void shouldCheckComputing_fromValueAndCode_ifFail(String value, String code) {
+        Result<String> result = DefaultResultBuilder.<String>compute(value, code);
+
+        assertThat(result.ok()).isFalse();
+        assertThat(result.value()).isNull();
+        assertThat(result.seed().code()).isEqualTo(code);
+        assertThat(result.seed().args()).isEmpty();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "some-value,",
+            ","
+    })
+    void shouldCheckComputing_fromSupplier_ifOk(String value, String code) {
+        Result<String> result = DefaultResultBuilder.<String>compute(
+                () -> {
+                    return value;
+                },
+                () -> {
+                    return code != null ? new TestSeed(code) : null;
+                }
+        );
+
+        assertThat(result.ok()).isTrue();
+        assertThat(result.value()).isEqualTo(value);
+        assertThat(result.seed()).isNull();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            ",some-code",
+            "some-value,some-code"
+    })
+    void shouldCheckComputing_fromSupplier_ifFail(String value, String code) {
+        Result<String> result = DefaultResultBuilder.<String>compute(
+                () -> {
+                    return value;
+                },
+                () -> {
+                    return code != null ? new TestSeed(code) : null;
+                }
+        );
+
+        assertThat(result.ok()).isFalse();
+        assertThat(result.value()).isNull();
+        assertThat(result.seed().code()).isEqualTo(code);
+        assertThat(result.seed().args()).isEmpty();
     }
 
     private Object getPrivateField(Object instance, String name) throws NoSuchFieldException, IllegalAccessException {
