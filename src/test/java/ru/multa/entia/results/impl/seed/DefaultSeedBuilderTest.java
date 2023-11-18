@@ -5,10 +5,12 @@ import org.junit.jupiter.api.Test;
 import ru.multa.entia.fakers.impl.Faker;
 import ru.multa.entia.results.api.seed.Seed;
 import ru.multa.entia.results.api.seed.SeedBuilder;
+import ru.multa.entia.results.impl.result.DefaultResultBuilder;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -143,6 +145,106 @@ class DefaultSeedBuilderTest {
         assertThat(seed.code()).isEqualTo(expectedCode);
         assertThat(Arrays.equals(seed.args(), expectedArgs)).isTrue();
     }
+
+    @Test
+    void shouldCheckStaticMethodSeed_withoutArgs() {
+        String expectedCode = Faker.str_().random();
+        Seed seed = DefaultSeedBuilder.<Object>seed(expectedCode);
+
+        assertThat(seed.code()).isEqualTo(expectedCode);
+        assertThat(seed.args()).isEmpty();
+    }
+
+    @Test
+    void shouldCheckStaticMethodSeed() {
+        String expectedCode = Faker.str_().random();
+        Integer arg0 = Faker.int_().random();
+        UUID arg1 = Faker.uuid_().random();
+
+        Seed seed = DefaultSeedBuilder.<Object>seed(expectedCode, arg0, arg1);
+
+        assertThat(seed.code()).isEqualTo(expectedCode);
+        assertThat(Arrays.equals(seed.args(), new Object[]{arg0, arg1})).isTrue();
+    }
+
+    @Test
+    void shouldCheckComputingFromSeedSuppliers_ifTheyEmpty() {
+        Seed seed = DefaultSeedBuilder.<Object>compute();
+
+        assertThat(seed).isNull();
+    }
+
+    @Test
+    void shouldCheckComputingFromSeedSuppliers_ifNoOneRetSeed() {
+        Seed seed = DefaultSeedBuilder.<Object>compute(
+                () -> {return null;},
+                () -> {return null;},
+                () -> {return null;}
+        );
+
+        assertThat(seed).isNull();
+    }
+
+    @Test
+    void shouldCheckComputingFromSeedSuppliers() {
+        String expectedCode0 = Faker.str_().random();
+        Integer arg00 = Faker.int_().random();
+        UUID arg01 = Faker.uuid_().random();
+
+        String expectedCode1 = Faker.str_().random();
+        Integer arg10 = Faker.int_().random();
+        UUID arg11 = Faker.uuid_().random();
+
+        Object[] expectedArgs = {arg00, arg01};
+
+        Seed seed = DefaultSeedBuilder.<Object>compute(
+                () -> {return null;},
+                () -> {return new TestSeed(expectedCode0, expectedArgs);},
+                () -> {return null;},
+                () -> {return new TestSeed(expectedCode1, new Object[]{arg10, arg11});},
+                () -> {return null;}
+        );
+
+        assertThat(seed.code()).isEqualTo(expectedCode0);
+        assertThat(Arrays.equals(seed.args(),expectedArgs)).isTrue();
+    }
+
+    @Test
+    void shouldCheckComputingFromStringSuppliers_ifTheyEmpty() {
+        Seed seed = DefaultSeedBuilder.<Object>computeFromStr();
+
+        assertThat(seed).isNull();
+    }
+
+    @Test
+    void shouldCheckComputingFromStringSuppliers_ifNoOneRetStr() {
+        Seed seed = DefaultSeedBuilder.<Object>computeFromStr(
+                () -> {return null;},
+                () -> {return null;},
+                () -> {return null;}
+        );
+
+        assertThat(seed).isNull();
+    }
+
+    @Test
+    void shouldCheckComputingFromStringSuppliers() {
+        String expectedCode0 = Faker.str_().random();
+        String expectedCode1 = Faker.str_().random();
+
+        Seed seed = DefaultSeedBuilder.<Object>computeFromStr(
+                () -> {return null;},
+                () -> {return expectedCode0;},
+                () -> {return null;},
+                () -> {return expectedCode1;},
+                () -> {return null;}
+        );
+
+        assertThat(seed.code()).isEqualTo(expectedCode0);
+        assertThat(seed.args()).isEmpty();
+    }
+
+    private record TestSeed(String code, Object[] args) implements Seed {}
 
     private Object getPrivateField(Object instance, String name) throws NoSuchFieldException, IllegalAccessException {
         Field field = instance.getClass().getDeclaredField(name);

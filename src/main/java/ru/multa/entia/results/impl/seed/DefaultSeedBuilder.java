@@ -4,9 +4,8 @@ import ru.multa.entia.results.api.result.ResultBuilder;
 import ru.multa.entia.results.api.seed.Seed;
 import ru.multa.entia.results.api.seed.SeedBuilder;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
+import java.util.function.Supplier;
 
 public class DefaultSeedBuilder<T> implements SeedBuilder<T> {
     public static final String DEFAULT_CODE = "";
@@ -16,10 +15,39 @@ public class DefaultSeedBuilder<T> implements SeedBuilder<T> {
     private String code = DEFAULT_CODE;
     private ResultBuilder<T> resultBuilder;
 
+    public static <T> Seed seed(final String code, final Object... args) {
+        return new DefaultSeedBuilder<T>()
+                .code(code)
+                .addLastArgs(args)
+                .build();
+    }
+
+    @SafeVarargs
+    public static <T> Seed compute(final Supplier<Seed>... suppliers) {
+        for (Supplier<Seed> supplier : suppliers) {
+            Seed seed = supplier.get();
+            if (seed != null) {
+                return seed;
+            }
+        }
+        return null;
+    }
+
+    @SafeVarargs
+    public static <T> Seed computeFromStr(final Supplier<String>... suppliers) {
+        for (Supplier<String> supplier : suppliers) {
+            String code = supplier.get();
+            if (code != null){
+                return seed(code);
+            }
+        }
+        return null;
+    }
+
     public DefaultSeedBuilder() {
     }
 
-    public DefaultSeedBuilder(ResultBuilder<T> result) {
+    public DefaultSeedBuilder(final ResultBuilder<T> result) {
         this.resultBuilder = result;
     }
 
