@@ -6,10 +6,16 @@ import ru.multa.entia.results.api.seed.Seed;
 import ru.multa.entia.results.api.seed.SeedBuilder;
 import ru.multa.entia.results.impl.seed.DefaultSeedBuilder;
 
+import java.util.function.Supplier;
+
 public class DefaultResultBuilder<T> implements ResultBuilder<T> {
     private boolean ok;
     private T value;
     private Seed seed;
+
+    public static <T> Result<T> ok(){
+        return new DefaultResultBuilder<T>().success(true).value(null).build();
+    }
 
     public static <T> Result<T> ok(final T value){
         return new DefaultResultBuilder<T>().success(true).value(value).build();
@@ -27,6 +33,19 @@ public class DefaultResultBuilder<T> implements ResultBuilder<T> {
 
     public static <T> Result<T> fail(final Seed seed){
         return fail(seed.code(), seed.args());
+    }
+
+    public static <T> Result<T> compute(T value, Seed seed) {
+        return seed == null ? ok(value) : fail(seed);
+    }
+
+    public static <T> Result<T> compute(T value, String code) {
+        return code == null ? ok(value) : fail(code);
+    }
+
+    public static <T> Result<T> compute(Supplier<T> valueSupplier, Supplier<Seed> seedSupplier){
+        Seed seed = seedSupplier.get();
+        return seed == null ? ok(valueSupplier.get()) : fail(seed);
     }
 
     @Override

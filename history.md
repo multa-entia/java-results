@@ -4,6 +4,7 @@
 - DefaultResultBuilder is enriched: method __ok__ without args is added
 - DefaultResultBuilder is enriched: methods __compute__ is added
 - Util. class Seeds is added
+- Util. class Results is added
 
 # V0.2
 
