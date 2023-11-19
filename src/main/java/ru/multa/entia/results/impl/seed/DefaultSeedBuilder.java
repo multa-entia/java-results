@@ -34,7 +34,7 @@ public class DefaultSeedBuilder<T> implements SeedBuilder<T> {
     }
 
     @SafeVarargs
-    public static <T> Seed computeFromStr(final Supplier<String>... suppliers) {
+    public static <T> Seed computeFromCodes(final Supplier<String>... suppliers) {
         for (Supplier<String> supplier : suppliers) {
             String code = supplier.get();
             if (code != null){

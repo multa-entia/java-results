@@ -11,6 +11,7 @@ import ru.multa.entia.results.api.seed.Seed;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -197,44 +198,97 @@ class DefaultResultBuilderTest {
         assertThat(result.seed().args()).isEmpty();
     }
 
-    @ParameterizedTest
-    @CsvSource({
-            "some-value,",
-            ","
-    })
-    void shouldCheckComputing_fromSupplier_ifOk(String value, String code) {
+    @Test
+    void shouldCheckComputing_fromSupplier_ifOk_seedSuppliersIsEmpty() {
+        String expectedValue = Faker.str_().random();
         Result<String> result = DefaultResultBuilder.<String>compute(
-                () -> {
-                    return value;
-                },
-                () -> {
-                    return code != null ? new TestSeed(code) : null;
-                }
+                () -> {return expectedValue;}
         );
 
         assertThat(result.ok()).isTrue();
-        assertThat(result.value()).isEqualTo(value);
+        assertThat(result.value()).isEqualTo(expectedValue);
         assertThat(result.seed()).isNull();
     }
 
-    @ParameterizedTest
-    @CsvSource({
-            ",some-code",
-            "some-value,some-code"
-    })
-    void shouldCheckComputing_fromSupplier_ifFail(String value, String code) {
+    @Test
+    void shouldCheckComputing_fromSupplier_ifOk_seedSuppliersRetNull() {
+        String expectedValue = Faker.str_().random();
         Result<String> result = DefaultResultBuilder.<String>compute(
-                () -> {
-                    return value;
-                },
-                () -> {
-                    return code != null ? new TestSeed(code) : null;
-                }
+                () -> {return expectedValue;},
+                () -> {return null;},
+                () -> {return null;},
+                () -> {return null;}
+        );
+
+        assertThat(result.ok()).isTrue();
+        assertThat(result.value()).isEqualTo(expectedValue);
+        assertThat(result.seed()).isNull();
+    }
+
+    @Test
+    void shouldCheckComputing_fromSupplier_ifFail() {
+        String expectedCode = Faker.str_().random();
+        Integer arg0 = Faker.int_().random();
+        UUID arg1 = Faker.uuid_().random();
+
+        Result<String> result = DefaultResultBuilder.<String>compute(
+                () -> {return Faker.str_().random();},
+                () -> {return null;},
+                () -> {return new TestSeed(expectedCode, new Object[]{arg0, arg1});},
+                () -> {return null;},
+                () -> {return new TestSeed(Faker.str_().random(), new Object[]{Faker.str_().random()});},
+                () -> {return null;}
         );
 
         assertThat(result.ok()).isFalse();
         assertThat(result.value()).isNull();
-        assertThat(result.seed().code()).isEqualTo(code);
+        assertThat(result.seed().code()).isEqualTo(expectedCode);
+        assertThat(Arrays.equals(result.seed().args(), new Object[]{arg0, arg1})).isTrue();
+    }
+
+    @Test
+    void shouldCheckComputingFromStr_fromSupplier_ifOk_seedSuppliersIsEmpty() {
+        String expectedValue = Faker.str_().random();
+        Result<String> result = DefaultResultBuilder.<String>computeFromCodes(
+                () -> {return expectedValue;}
+        );
+
+        assertThat(result.ok()).isTrue();
+        assertThat(result.value()).isEqualTo(expectedValue);
+        assertThat(result.seed()).isNull();
+    }
+
+    @Test
+    void shouldCheckComputingFromStr_fromSupplier_ifOk_seedSuppliersRetNull() {
+        String expectedValue = Faker.str_().random();
+        Result<String> result = DefaultResultBuilder.<String>computeFromCodes(
+                () -> {return expectedValue;},
+                () -> {return null;},
+                () -> {return null;},
+                () -> {return null;}
+        );
+
+        assertThat(result.ok()).isTrue();
+        assertThat(result.value()).isEqualTo(expectedValue);
+        assertThat(result.seed()).isNull();
+    }
+
+    @Test
+    void shouldCheckComputingFromStr_fromSupplier_ifFail() {
+        String expectedCode = Faker.str_().random();
+
+        Result<String> result = DefaultResultBuilder.<String>computeFromCodes(
+                () -> {return Faker.str_().random();},
+                () -> {return null;},
+                () -> {return expectedCode;},
+                () -> {return null;},
+                () -> {return Faker.str_().random();},
+                () -> {return null;}
+        );
+
+        assertThat(result.ok()).isFalse();
+        assertThat(result.value()).isNull();
+        assertThat(result.seed().code()).isEqualTo(expectedCode);
         assertThat(result.seed().args()).isEmpty();
     }
 

@@ -35,17 +35,34 @@ public class DefaultResultBuilder<T> implements ResultBuilder<T> {
         return fail(seed.code(), seed.args());
     }
 
-    public static <T> Result<T> compute(T value, Seed seed) {
+    public static <T> Result<T> compute(final T value, final Seed seed) {
         return seed == null ? ok(value) : fail(seed);
     }
 
-    public static <T> Result<T> compute(T value, String code) {
+    public static <T> Result<T> compute(final T value, final String code) {
         return code == null ? ok(value) : fail(code);
     }
 
-    public static <T> Result<T> compute(Supplier<T> valueSupplier, Supplier<Seed> seedSupplier){
-        Seed seed = seedSupplier.get();
-        return seed == null ? ok(valueSupplier.get()) : fail(seed);
+    @SafeVarargs
+    public static <T> Result<T> compute(final Supplier<T> valueSupplier, final Supplier<Seed>... seedSuppliers){
+        for (Supplier<Seed> supplier : seedSuppliers) {
+            Seed seed = supplier.get();
+            if (seed != null) {
+                return fail(seed);
+            }
+        }
+        return ok(valueSupplier.get());
+    }
+
+    @SafeVarargs
+    public static <T> Result<T> computeFromCodes(final Supplier<T> valueSupplier, final Supplier<String>... codeSuppliers){
+        for (Supplier<String> supplier : codeSuppliers) {
+            String code = supplier.get();
+            if (code != null) {
+                return fail(code);
+            }
+        }
+        return ok(valueSupplier.get());
     }
 
     @Override

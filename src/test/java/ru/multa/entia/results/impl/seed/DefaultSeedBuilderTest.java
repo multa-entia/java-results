@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import ru.multa.entia.fakers.impl.Faker;
 import ru.multa.entia.results.api.seed.Seed;
 import ru.multa.entia.results.api.seed.SeedBuilder;
-import ru.multa.entia.results.impl.result.DefaultResultBuilder;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -211,14 +210,14 @@ class DefaultSeedBuilderTest {
 
     @Test
     void shouldCheckComputingFromStringSuppliers_ifTheyEmpty() {
-        Seed seed = DefaultSeedBuilder.<Object>computeFromStr();
+        Seed seed = DefaultSeedBuilder.<Object>computeFromCodes();
 
         assertThat(seed).isNull();
     }
 
     @Test
     void shouldCheckComputingFromStringSuppliers_ifNoOneRetStr() {
-        Seed seed = DefaultSeedBuilder.<Object>computeFromStr(
+        Seed seed = DefaultSeedBuilder.<Object>computeFromCodes(
                 () -> {return null;},
                 () -> {return null;},
                 () -> {return null;}
@@ -232,7 +231,7 @@ class DefaultSeedBuilderTest {
         String expectedCode0 = Faker.str_().random();
         String expectedCode1 = Faker.str_().random();
 
-        Seed seed = DefaultSeedBuilder.<Object>computeFromStr(
+        Seed seed = DefaultSeedBuilder.<Object>computeFromCodes(
                 () -> {return null;},
                 () -> {return expectedCode0;},
                 () -> {return null;},
