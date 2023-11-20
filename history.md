@@ -1,12 +1,16 @@
 
-# V04.
+# v0.5
+
+-
+
+# V0.4
 
 - DefaultSeedBuilder is enriched: static method __seed__ is added
 - DefaultSeedBuilder is enriched: static method __compute__ is added
 - DefaultSeedBuilder is enriched: static method __computeFromStr__ is added
 - DefaultResultBuilder is changed: __compute(FromStr)__ methods is changed
 
-# V03.
+# V0.3
 
 - DefaultResultBuilder is enriched: method __ok__ without args is added
 - DefaultResultBuilder is enriched: methods __compute__ is added
