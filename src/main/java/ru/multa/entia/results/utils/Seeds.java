@@ -15,4 +15,8 @@ public class Seeds {
 
         return false;
     }
+
+    public static SeedsComparator comparator(final Seed target) {
+        return new SeedsComparator(target);
+    }
 }

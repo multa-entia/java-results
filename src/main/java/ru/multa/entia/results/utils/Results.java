@@ -14,4 +14,8 @@ public class Results {
                         Seeds.equal(r0.seed(), r1.seed())
                 );
     }
+
+    public static ResultsComparator comparator(final Result<?> target) {
+        return new ResultsComparator(target);
+    }
 }

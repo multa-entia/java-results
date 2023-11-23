@@ -1,7 +1,8 @@
 
 # v0.5
 
--
+- ResultsComparator is added
+- SeedsComparator is added
 
 # V0.4
 
