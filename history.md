@@ -1,4 +1,8 @@
 
+# v0.6
+
+- Mode args-are-empty is added into SeedsComparator
+
 # v0.5
 
 - ResultsComparator is added

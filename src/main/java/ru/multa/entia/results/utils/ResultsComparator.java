@@ -3,9 +3,8 @@ package ru.multa.entia.results.utils;
 import lombok.RequiredArgsConstructor;
 import ru.multa.entia.results.api.result.Result;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 public class ResultsComparator {
@@ -15,6 +14,13 @@ public class ResultsComparator {
         VALUE,
         SEED
     }
+
+    private static final EnumMap<Mode, Function<ResultsComparator, Optional<Boolean>>> CHECKERS = new EnumMap<>(Mode.class) {{
+        put(Mode.IS_NULL, new IsNullChecker());
+        put(Mode.OK, new OkChecker());
+        put(Mode.VALUE, new ValueChecker());
+        put(Mode.SEED, new SeedChecker());
+    }};
 
     private final Result<?> target;
 
@@ -63,27 +69,53 @@ public class ResultsComparator {
     }
 
     public boolean compare() {
-        if (modes.contains(Mode.IS_NULL)) {
-            return target == null;
-        }
-
         boolean result = !modes.isEmpty();
         for (Mode mode : modes) {
-            switch (mode) {
-                case OK -> {
-                    result &= target != null && ok == target.ok();
-                }
-
-                case VALUE -> {
-                    result &= target != null && Objects.equals(value, target.value());
-                }
-
-                case SEED -> {
-                    result &= seedsComparator.compare();
-                }
+            Optional<Boolean> checkResult = CHECKERS.get(mode).apply(this);
+            if (checkResult.isPresent()) {
+                result &= checkResult.get();
             }
         }
 
         return result;
+    }
+
+    public static class IsNullChecker implements Function<ResultsComparator, Optional<Boolean>> {
+        @Override
+        public Optional<Boolean> apply(final ResultsComparator comparator) {
+            return comparator.modes.contains(Mode.IS_NULL)
+                    ? Optional.of(comparator.target == null)
+                    : Optional.empty();
+        }
+    }
+
+    public static class OkChecker implements Function<ResultsComparator, Optional<Boolean>> {
+        @Override
+        public Optional<Boolean> apply(final ResultsComparator comparator) {
+            Set<Mode> ms = comparator.modes;
+            return !ms.contains(Mode.IS_NULL) && ms.contains(Mode.OK)
+                    ? Optional.of(comparator.target != null && comparator.target.ok() == comparator.ok)
+                    : Optional.empty();
+        }
+    }
+
+    public static class ValueChecker implements Function<ResultsComparator, Optional<Boolean>> {
+        @Override
+        public Optional<Boolean> apply(final ResultsComparator comparator) {
+            Set<Mode> ms = comparator.modes;
+            return !ms.contains(Mode.IS_NULL) && ms.contains(Mode.VALUE)
+                    ? Optional.of(comparator.target != null && Objects.equals(comparator.target.value(), comparator.value))
+                    : Optional.empty();
+        }
+    }
+
+    public static class SeedChecker implements Function<ResultsComparator, Optional<Boolean>> {
+        @Override
+        public Optional<Boolean> apply(final ResultsComparator comparator) {
+            Set<Mode> ms = comparator.modes;
+            return !ms.contains(Mode.IS_NULL) && ms.contains(Mode.SEED)
+                    ? Optional.of(comparator.target != null && comparator.seedsComparator.compare())
+                    : Optional.empty();
+        }
     }
 }

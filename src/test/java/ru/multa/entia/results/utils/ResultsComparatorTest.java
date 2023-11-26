@@ -3,12 +3,186 @@ package ru.multa.entia.results.utils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import ru.multa.entia.fakers.impl.Faker;
 import ru.multa.entia.results.api.result.Result;
 import ru.multa.entia.results.api.seed.Seed;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ResultsComparatorTest {
+
+    @Test
+    void shouldCheckIsNullChecker_ifModeIsOff() {
+        ResultsComparator comparator = new ResultsComparator(null);
+        ResultsComparator.IsNullChecker checker = new ResultsComparator.IsNullChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldCheckIsNullChecker_ifModeIsOnAndTargetIsNotNull() {
+        ResultsComparator comparator = new ResultsComparator(new TestResult<>(false, null, null)).isNull();
+        ResultsComparator.IsNullChecker checker = new ResultsComparator.IsNullChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isFalse();
+    }
+
+    @Test
+    void shouldCheckIsNullChecker_ifModeIsOnAndTargetIsNull() {
+        ResultsComparator comparator = new ResultsComparator(null).isNull();
+        ResultsComparator.IsNullChecker checker = new ResultsComparator.IsNullChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isTrue();
+    }
+
+    @Test
+    void shouldCheckOkCheckMode_ifIsNullModeIsOn() {
+        ResultsComparator comparator = new ResultsComparator(null).isNull();
+        ResultsComparator.OkChecker checker = new ResultsComparator.OkChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldCheckOkCheckMode_ifOkModeIsOff() {
+        ResultsComparator comparator = new ResultsComparator(null);
+        ResultsComparator.OkChecker checker = new ResultsComparator.OkChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldCheckOkCheckMode_ifOkModeIsOnAndCheckingFail() {
+        ResultsComparator comparator = new ResultsComparator(new TestResult<>(false, null, null)).ok(true);
+        ResultsComparator.OkChecker checker = new ResultsComparator.OkChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isFalse();
+    }
+
+    @Test
+    void shouldCheckOkCheckMode_ifOkModeIsOnAndCheckingSuccess() {
+        boolean ok = true;
+        ResultsComparator comparator = new ResultsComparator(new TestResult<>(ok, null, null)).ok(ok);
+        ResultsComparator.OkChecker checker = new ResultsComparator.OkChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isTrue();
+    }
+
+    @Test
+    void shouldCheckValueCheckMode_ifIsNullModeIsOn() {
+        ResultsComparator comparator = new ResultsComparator(null).isNull();
+        ResultsComparator.ValueChecker checker = new ResultsComparator.ValueChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldCheckValueCheckMode_ifValueModeIsOff() {
+        ResultsComparator comparator = new ResultsComparator(null);
+        ResultsComparator.ValueChecker checker = new ResultsComparator.ValueChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldCheckValueCheckMode_ifValueModeIsOnAndCheckingFail() {
+        String value = Faker.str_().random();
+        ResultsComparator comparator = new ResultsComparator(new TestResult<>(false, value, null))
+                .value(value + Faker.str_().random());
+        ResultsComparator.ValueChecker checker = new ResultsComparator.ValueChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isFalse();
+    }
+
+    @Test
+    void shouldCheckValueCheckMode_ifValueModeIsOnAndCheckingSuccess() {
+        String value = Faker.str_().random();
+        ResultsComparator comparator = new ResultsComparator(new TestResult<>(false, value, null))
+                .value(value);
+        ResultsComparator.ValueChecker checker = new ResultsComparator.ValueChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isTrue();
+    }
+
+    @Test
+    void shouldCheckSeedCheckMode_ifIsNullModeIsOn() {
+        ResultsComparator comparator = new ResultsComparator(null).isNull();
+        ResultsComparator.SeedChecker checker = new ResultsComparator.SeedChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldCheckSeedCheckMode_ifSeedModeIsOff() {
+        ResultsComparator comparator = new ResultsComparator(null);
+        ResultsComparator.SeedChecker checker = new ResultsComparator.SeedChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldCheckSeedCheckMode_ifSeedModeIsOnAndCheckingFail() {
+        String code = Faker.str_().random();
+        TestSeed seed = new TestSeed(code, new Object[0]);
+
+        ResultsComparator comparator = new ResultsComparator(new TestResult<>(false, null,  seed))
+                .seedsComparator().code(code + Faker.str_().random()).back();
+        ResultsComparator.SeedChecker checker = new ResultsComparator.SeedChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isFalse();
+    }
+
+    @Test
+    void shouldCheckSeedCheckMode_ifSeedModeIsOnAndCheckingSuccess() {
+        String code = Faker.str_().random();
+        TestSeed seed = new TestSeed(code, new Object[0]);
+
+        ResultsComparator comparator = new ResultsComparator(new TestResult<>(false, null,  seed))
+                .seedsComparator().code(code).back();
+        ResultsComparator.SeedChecker checker = new ResultsComparator.SeedChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isTrue();
+    }
 
     @Test
     void shouldCheckComparison_nullMode_targetIsNotNull() {

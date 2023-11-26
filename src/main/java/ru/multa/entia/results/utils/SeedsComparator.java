@@ -23,7 +23,7 @@ public class SeedsComparator {
     private final Seed target;
     private final ResultsComparator parent;
 
-    private Set<Mode> modes = new HashSet<>();
+    private final Set<Mode> modes = new HashSet<>();
     private String code = null;
     private Object[] args = new Object[0];
 
