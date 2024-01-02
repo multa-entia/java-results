@@ -1,4 +1,8 @@
 
+# v0.7.1
+
+- Fix default getting of DefaultCodeRepository
+
 # v0.7
 
 - DefaultCodeRepository is added

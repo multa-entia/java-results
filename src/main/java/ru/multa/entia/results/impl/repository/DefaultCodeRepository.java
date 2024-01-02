@@ -23,11 +23,9 @@ public class DefaultCodeRepository implements CodeRepository {
         );
     }
 
-    public synchronized static CodeRepository getDefaultInstance(final Params params,
-                                                                 final Function<Object, String> absenceCodeGenerator,
-                                                                 final Map<Object, String> codes){
+    public synchronized static CodeRepository getDefaultInstance(){
         if (instance == null) {
-            instance = newInstance(params, absenceCodeGenerator, codes);
+            instance = newInstance(null, null, null);
         }
         return instance;
     }

@@ -255,8 +255,8 @@ class DefaultCodeRepositoryTest {
 
     @Test
     void shouldCheckDefaultInstanceGetting() {
-        CodeRepository firstInstance = DefaultCodeRepository.getDefaultInstance(null, null, null);
-        CodeRepository secondInstance = DefaultCodeRepository.getDefaultInstance(null, null, null);
+        CodeRepository firstInstance = DefaultCodeRepository.getDefaultInstance();
+        CodeRepository secondInstance = DefaultCodeRepository.getDefaultInstance();
 
         assertThat(firstInstance).isEqualTo(secondInstance);
     }
