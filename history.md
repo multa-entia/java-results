@@ -1,4 +1,8 @@
 
+# v0.7
+
+- DefaultCodeRepository is added
+
 # v0.6
 
 - Mode args-are-empty is added into SeedsComparator
