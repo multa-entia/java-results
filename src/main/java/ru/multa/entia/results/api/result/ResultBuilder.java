@@ -7,6 +7,7 @@ public interface ResultBuilder<T> {
     ResultBuilder<T> success(boolean ok);
     ResultBuilder<T> value(T value);
     ResultBuilder<T> seed(Seed seed);
+    ResultBuilder<T> causes(Result<?>... causes);
     SeedBuilder<T> seedBuilder();
     Result<T> build();
 }

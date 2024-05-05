@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import ru.multa.entia.fakers.impl.Faker;
 import ru.multa.entia.results.api.seed.Seed;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DefaultResultTest {
@@ -29,15 +31,22 @@ class DefaultResultTest {
     }
 
     @Test
-    void shouldCheckCreation() {
-        final String expectedValue = Faker.str_().random(5, 10);
-        final TestSeed expectedSeed = new TestSeed(Faker.int_().between(5, 10));
+    void shouldCheckCreation_ifCausesNull() {
+        DefaultResult<String> result = new DefaultResult<>(false, null, null, null);
+        assertThat(result.causes()).isEmpty();
+    }
 
-        DefaultResult<String> result = new DefaultResult<>(true, expectedValue, expectedSeed);
+    @Test
+    void shouldCheckCreation() {
+        String expectedValue = Faker.str_().random(5, 10);
+        TestSeed expectedSeed = new TestSeed(Faker.int_().between(5, 10));
+
+        DefaultResult<String> result = new DefaultResult<>(true, expectedValue, expectedSeed, List.of());
 
         assertThat(result.ok()).isTrue();
         assertThat(result.value()).isEqualTo(expectedValue);
         assertThat(result.seed()).isEqualTo(expectedSeed);
+        assertThat(result.causes()).isEmpty();
     }
 
     @RequiredArgsConstructor

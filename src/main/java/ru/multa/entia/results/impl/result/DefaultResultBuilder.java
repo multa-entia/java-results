@@ -6,12 +6,16 @@ import ru.multa.entia.results.api.seed.Seed;
 import ru.multa.entia.results.api.seed.SeedBuilder;
 import ru.multa.entia.results.impl.seed.DefaultSeedBuilder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class DefaultResultBuilder<T> implements ResultBuilder<T> {
     private boolean ok;
     private T value;
     private Seed seed;
+    private List<Result<?>> causes = new ArrayList<>();
 
     public static <T> Result<T> ok(){
         return new DefaultResultBuilder<T>().success(true).value(null).build();
@@ -84,13 +88,19 @@ public class DefaultResultBuilder<T> implements ResultBuilder<T> {
     }
 
     @Override
+    public ResultBuilder<T> causes(final Result<?>... causes) {
+        this.causes.addAll(Arrays.asList(causes));
+        return this;
+    }
+
+    @Override
     public SeedBuilder<T> seedBuilder() {
         return createSeedBuilder();
     }
 
     @Override
     public Result<T> build() {
-        return new DefaultResult<T>(ok, value, seed);
+        return new DefaultResult<T>(ok, value, seed, causes);
     }
 
     private SeedBuilder<T> createSeedBuilder(){

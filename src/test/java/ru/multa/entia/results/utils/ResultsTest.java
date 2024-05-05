@@ -7,6 +7,9 @@ import ru.multa.entia.fakers.impl.Faker;
 import ru.multa.entia.results.api.result.Result;
 import ru.multa.entia.results.api.seed.Seed;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ResultsTest {
@@ -130,6 +133,34 @@ class ResultsTest {
 
     @ParameterizedTest
     @CsvSource({
+            "code0,code0,cause0-cause1,cause0-cause1,true",
+            "code0,code1,cause0-cause1,cause0-cause1,false",
+            "code0,code0,cause0-cause1,cause10-cause11,false",
+            "code0,code1,cause0-cause1,cause10-cause11,false"
+    })
+    void shouldCheckEqualMethod_byCauses(String code0,
+                                         String code1,
+                                         String rawCauses0,
+                                         String rawCauses1,
+                                         boolean expectedResult) {
+        ArrayList<Result<?>> causes0 = new ArrayList<>();
+        for (String code : rawCauses0.split("-")) {
+            causes0.add(new TestResult<>(false, null, new TestSeed(code, new Object[0])));
+        }
+
+        ArrayList<Result<?>> causes1 = new ArrayList<>();
+        for (String code : rawCauses1.split("-")) {
+            causes1.add(new TestResult<>(false, null, new TestSeed(code, new Object[0])));
+        }
+
+        TestResult<String> result0 = new TestResult<String>(false, code0, new TestSeed("", new Object[0]), causes0);
+        TestResult<String> result1 = new TestResult<String>(false, code1, new TestSeed("", new Object[0]), causes1);
+
+        assertThat(Results.equal(result0, result1)).isEqualTo(expectedResult);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
             ",,true",
             ",value,false",
             "value,,false",
@@ -175,5 +206,9 @@ class ResultsTest {
     }
 
     private record TestSeed(String code, Object[] args) implements Seed {}
-    private record TestResult<T>(boolean ok, T value, Seed seed) implements Result<T> {}
+    private record TestResult<T>(boolean ok, T value, Seed seed, List<Result<?>> causes) implements Result<T> {
+        public TestResult(boolean ok, T value, Seed seed) {
+            this(ok, value, seed, List.of());
+        }
+    }
 }

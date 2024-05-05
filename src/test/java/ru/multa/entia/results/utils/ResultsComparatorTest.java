@@ -7,6 +7,7 @@ import ru.multa.entia.fakers.impl.Faker;
 import ru.multa.entia.results.api.result.Result;
 import ru.multa.entia.results.api.seed.Seed;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -185,6 +186,48 @@ class ResultsComparatorTest {
     }
 
     @Test
+    void shouldCheckCauseCheckMode_ifCauseModeIsOff() {
+        ResultsComparator comparator = new ResultsComparator(null);
+        ResultsComparator.CausesChecker checker = new ResultsComparator.CausesChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldCheckCauseCheckMode_ifCauseModeIsOnAndCheckingFail() {
+//        String code = Faker.str_().random();
+//        TestSeed seed = new TestSeed(code, new Object[0]);
+//
+//        new ResultsComparator()
+
+//        ResultsComparator comparator = new ResultsComparator(new TestResult<>(false, null,  seed))
+//                .seedsComparator().code(code + Faker.str_().random()).back();
+//        ResultsComparator.SeedChecker checker = new ResultsComparator.SeedChecker();
+//
+//        Optional<Boolean> result = checker.apply(comparator);
+//
+//        assertThat(result).isPresent();
+//        assertThat(result.get()).isFalse();
+    }
+
+    @Test
+    void shouldCheckCauseCheckMode_ifCauseModeIsOnAndCheckingSuccess() {
+//        String code = Faker.str_().random();
+//        TestSeed seed = new TestSeed(code, new Object[0]);
+//
+//        ResultsComparator comparator = new ResultsComparator(new TestResult<>(false, null,  seed))
+//                .seedsComparator().code(code).back();
+//        ResultsComparator.SeedChecker checker = new ResultsComparator.SeedChecker();
+//
+//        Optional<Boolean> result = checker.apply(comparator);
+//
+//        assertThat(result).isPresent();
+//        assertThat(result.get()).isTrue();
+    }
+
+    @Test
     void shouldCheckComparison_nullMode_targetIsNotNull() {
         boolean result = new ResultsComparator(new TestResult<>(false, new Object(), null))
                 .isNull()
@@ -297,6 +340,10 @@ class ResultsComparatorTest {
         assertThat(result).isEqualTo(expectedResult);
     }
 
-    private record TestResult<T>(boolean ok, T value, Seed seed) implements Result<T> {}
+    private record TestResult<T>(boolean ok, T value, Seed seed, List<Result<?>> causes) implements Result<T> {
+        public TestResult(boolean ok, T value, Seed seed) {
+            this(ok, value, seed, List.of());
+        }
+    }
     private record TestSeed(String code, Object[] args) implements Seed {}
 }

@@ -4,18 +4,32 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mockito;
 import ru.multa.entia.fakers.impl.Faker;
 import ru.multa.entia.results.api.result.Result;
 import ru.multa.entia.results.api.result.ResultBuilder;
 import ru.multa.entia.results.api.seed.Seed;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DefaultResultBuilderTest {
+
+    private static final Function<String, Result<Float>> CAUSE_FUNCTION = code -> {
+        CauseResult result = Mockito.mock(CauseResult.class);
+        Mockito.when(result.ok()).thenReturn(false);
+        Mockito.when(result.value()).thenReturn(null);
+        Mockito.when(result.seed()).thenReturn(new TestSeed(code));
+        Mockito.when(result.causes()).thenReturn(List.of());
+
+        return result;
+    };
 
     @SneakyThrows
     @Test
@@ -45,6 +59,22 @@ class DefaultResultBuilderTest {
         Object result = getPrivateField(builder, "seed");
 
         assertThat(result).isEqualTo(expectedSeed);
+    }
+
+    @SneakyThrows
+    @Test
+    void shouldCheckCausesSetting() {
+        DefaultResultBuilder<String> builder = new DefaultResultBuilder<>();
+        ArrayList<Result<?>> expectedCauses = new ArrayList<>();
+        int quantity = Faker.int_().between(5, 10);
+        for (int i = 0; i < quantity; i++) {
+            Result<Float> cause = CAUSE_FUNCTION.apply(Faker.str_().random());
+            expectedCauses.add(cause);
+            builder.causes(cause);
+        }
+        Object gottenCauses = getPrivateField(builder, "causes");
+
+        assertThat(gottenCauses).isEqualTo(expectedCauses);
     }
 
     @SneakyThrows
@@ -90,6 +120,40 @@ class DefaultResultBuilderTest {
         Object[] args = result.seed().args();
         assertThat(args).hasSize(1);
         assertThat(args[0]).isEqualTo(expectedArg);
+    }
+
+    @Test
+    void shouldCheckBuilding_withCauses() {
+        boolean expectedSuccess = false;
+        String expectedValue = Faker.str_().random(5, 10);
+        String expectedCode = Faker.str_().random(5, 10);
+        String expectedArg = Faker.str_().random(5, 10);
+
+        ResultBuilder<String> builder = new DefaultResultBuilder<String>()
+                .success(expectedSuccess)
+                .value(expectedValue)
+                .seedBuilder()
+                .code(expectedCode)
+                .addLastArgs(expectedArg)
+                .apply();
+
+        ArrayList<Result<?>> expectedCauses = new ArrayList<>();
+        int quantity = Faker.int_().between(5, 10);
+        for (int i = 0; i < quantity; i++) {
+            Result<Float> cause = CAUSE_FUNCTION.apply(Faker.str_().random());
+            expectedCauses.add(cause);
+            builder.causes(cause);
+        }
+
+        Result<String> result = builder.build();
+
+        assertThat(result.ok()).isEqualTo(expectedSuccess);
+        assertThat(result.value()).isEqualTo(expectedValue);
+        assertThat(result.seed().code()).isEqualTo(expectedCode);
+        Object[] args = result.seed().args();
+        assertThat(args).hasSize(1);
+        assertThat(args[0]).isEqualTo(expectedArg);
+        assertThat(result.causes()).isEqualTo(expectedCauses);
     }
 
     @Test
@@ -299,5 +363,6 @@ class DefaultResultBuilderTest {
         return field.get(instance);
     }
 
+    public interface CauseResult extends Result<Float> {}
     private record TestSeed(String code, Object... args) implements Seed {}
 }

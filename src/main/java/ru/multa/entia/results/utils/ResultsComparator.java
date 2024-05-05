@@ -12,7 +12,8 @@ public class ResultsComparator {
         IS_NULL,
         OK,
         VALUE,
-        SEED
+        SEED,
+        CAUSES
     }
 
     private static final EnumMap<Mode, Function<ResultsComparator, Optional<Boolean>>> CHECKERS = new EnumMap<>(Mode.class) {{
@@ -56,6 +57,11 @@ public class ResultsComparator {
         this.modes.add(Mode.VALUE);
         this.value = value;
         return this;
+    }
+
+    public ResultsComparator causes(final List<Result<?>> causes) {
+        // TODO: !!!
+        return null;
     }
 
     public SeedsComparator seedsComparator() {
@@ -116,6 +122,14 @@ public class ResultsComparator {
             return !ms.contains(Mode.IS_NULL) && ms.contains(Mode.SEED)
                     ? Optional.of(comparator.target != null && comparator.seedsComparator.compare())
                     : Optional.empty();
+        }
+    }
+
+    public static class CausesChecker implements Function<ResultsComparator, Optional<Boolean>> {
+        @Override
+        public Optional<Boolean> apply(final ResultsComparator comparator) {
+
+            return null;
         }
     }
 }

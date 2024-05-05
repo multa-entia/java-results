@@ -1,4 +1,10 @@
 
+# v0.8
+
+- causes<List<Result<?>>> is added into Result
+- builder is modified - causes setting is added
+- Results::equal is changed - added comparison of causes
+
 # v0.7.1
 
 - Fix default getting of DefaultCodeRepository
