@@ -4,6 +4,7 @@
 - causes<List<Result<?>>> is added into Result
 - builder is modified - causes setting is added
 - Results::equal is changed - added comparison of causes
+- Comparison of causes is added into ResultComparator
 
 # v0.7.1
 

@@ -7,6 +7,7 @@ import ru.multa.entia.fakers.impl.Faker;
 import ru.multa.entia.results.api.result.Result;
 import ru.multa.entia.results.api.seed.Seed;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -197,34 +198,47 @@ class ResultsComparatorTest {
 
     @Test
     void shouldCheckCauseCheckMode_ifCauseModeIsOnAndCheckingFail() {
-//        String code = Faker.str_().random();
-//        TestSeed seed = new TestSeed(code, new Object[0]);
-//
-//        new ResultsComparator()
+        List<Result<?>> testCauses = new ArrayList<>();
+        int testQuantity = Faker.int_().between(5, 10);
+        for (int i = 0; i < testQuantity; i++) {
+            testCauses.add(new TestResult<>(false, null, new TestSeed(Faker.str_().random(), new Object[0])));
+        }
 
-//        ResultsComparator comparator = new ResultsComparator(new TestResult<>(false, null,  seed))
-//                .seedsComparator().code(code + Faker.str_().random()).back();
-//        ResultsComparator.SeedChecker checker = new ResultsComparator.SeedChecker();
-//
-//        Optional<Boolean> result = checker.apply(comparator);
-//
-//        assertThat(result).isPresent();
-//        assertThat(result.get()).isFalse();
+        List<Result<?>> causes = new ArrayList<>();
+        int quantity = Faker.int_().between(5, 10);
+        for (int i = 0; i < quantity; i++) {
+            causes.add(new TestResult<>(false, null, new TestSeed(Faker.str_().random(), new Object[0])));
+        }
+
+        ResultsComparator comparator = new ResultsComparator(new TestResult<>(false, null, null, causes))
+                .causes(testCauses);
+        ResultsComparator.CausesChecker checker = new ResultsComparator.CausesChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isFalse();
     }
 
     @Test
     void shouldCheckCauseCheckMode_ifCauseModeIsOnAndCheckingSuccess() {
-//        String code = Faker.str_().random();
-//        TestSeed seed = new TestSeed(code, new Object[0]);
-//
-//        ResultsComparator comparator = new ResultsComparator(new TestResult<>(false, null,  seed))
-//                .seedsComparator().code(code).back();
-//        ResultsComparator.SeedChecker checker = new ResultsComparator.SeedChecker();
-//
-//        Optional<Boolean> result = checker.apply(comparator);
-//
-//        assertThat(result).isPresent();
-//        assertThat(result.get()).isTrue();
+        List<Result<?>> testCauses = new ArrayList<>();
+        List<Result<?>> causes = new ArrayList<>();
+        int quantity = Faker.int_().between(5, 10);
+        for (int i = 0; i < quantity; i++) {
+            String code = Faker.str_().random();
+            causes.add(new TestResult<>(false, null, new TestSeed(code, new Object[0])));
+            testCauses.add(new TestResult<>(false, null, new TestSeed(code, new Object[0])));
+        }
+
+        ResultsComparator comparator = new ResultsComparator(new TestResult<>(false, null, null, causes))
+                .causes(testCauses);
+        ResultsComparator.CausesChecker checker = new ResultsComparator.CausesChecker();
+
+        Optional<Boolean> result = checker.apply(comparator);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isTrue();
     }
 
     @Test

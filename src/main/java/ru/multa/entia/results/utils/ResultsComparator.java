@@ -30,6 +30,7 @@ public class ResultsComparator {
     private SeedsComparator seedsComparator;
     private boolean ok;
     private Object value;
+    private List<Result<?>> causes;
 
     public ResultsComparator isNull() {
         this.modes.clear();
@@ -60,8 +61,10 @@ public class ResultsComparator {
     }
 
     public ResultsComparator causes(final List<Result<?>> causes) {
-        // TODO: !!!
-        return null;
+        this.modes.remove(Mode.IS_NULL);
+        this.modes.add(Mode.CAUSES);
+        this.causes = causes;
+        return this;
     }
 
     public SeedsComparator seedsComparator() {
@@ -128,8 +131,10 @@ public class ResultsComparator {
     public static class CausesChecker implements Function<ResultsComparator, Optional<Boolean>> {
         @Override
         public Optional<Boolean> apply(final ResultsComparator comparator) {
-
-            return null;
+            Set<Mode> ms = comparator.modes;
+            return !ms.contains(Mode.IS_NULL) && ms.contains(Mode.CAUSES)
+                    ? Optional.of(comparator.target != null && Results.equalCauses(comparator.target.causes(), comparator.causes))
+                    : Optional.empty();
         }
     }
 }
