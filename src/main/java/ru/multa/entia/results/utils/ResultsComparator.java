@@ -21,6 +21,7 @@ public class ResultsComparator {
         put(Mode.OK, new OkChecker());
         put(Mode.VALUE, new ValueChecker());
         put(Mode.SEED, new SeedChecker());
+        put(Mode.CAUSES, new CausesChecker());
     }};
 
     private final Result<?> target;

@@ -1,4 +1,8 @@
 
+# v0.8.1
+
+- fix result comparison
+
 # v0.8
 
 - causes<List<Result<?>>> is added into Result
