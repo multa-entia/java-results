@@ -1,4 +1,8 @@
 
+# v0.8.2
+
+- readme is added
+
 # v0.8.1
 
 - fix result comparison
